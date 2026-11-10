@@ -551,12 +551,11 @@ def leer_tablas(df_l: pd.DataFrame, df_n: pd.DataFrame):
 # ============================================================================
 # INTERFAZ STREAMLIT
 # ============================================================================
-st.set_page_config(page_title="Sink Tree · Rutas óptimas", page_icon="🌐", layout="wide")
+st.set_page_config(page_title="Sink Tree · Rutas óptimas", layout="wide")
 
 C_NODO, C_ORIGEN, C_DESTINO, C_AISLADO = "#264653", "#3a86ff", "#ffb703", "#adb5bd"
-C_ENLACE, C_CAIDO, C_QOS, C_ARBOL = "#9aa5b1", "#ef476f", "#f4a261", "#2a9d8f"
-C_RUTAS = ["#06d6a0", "#ff9f1c", "#9b5de5", "#f15bb5", "#00bbf9"]
-EMOJI_RUTAS = ["🟢", "🟠", "🟣", "🩷", "🔵"]
+C_ENLACE, C_CAIDO, C_QOS, C_ARBOL = "#5f6f7f", "#d62839", "#e07a1f", "#1b7f74"
+C_RUTAS = ["#00a676", "#f77f00", "#7b2cbf", "#d00070", "#0077b6"]
 
 st.markdown(
     """
@@ -600,7 +599,7 @@ if "links_src" not in ss:
     ss.origen, ss.destino = "H", "B"
 
 for _k, _v in {"metrica": PESO, "K": 3, "pa": 0.25, "pb": 0.30, "pg": 0.25, "pd": 0.20,
-               "bmin": 0.0, "sim": True, "intervalo": 2.0, "vol": 0.06, "pfalla": 0.01,
+               "bmin": 0.0, "sim": True, "intervalo": 6.0, "vol": 0.04, "pfalla": 0.01,
                "afecta": False, "alto": 620, "tam": 40, "etiqueta": "Peso",
                "overlay": False, "modo_clic": "Destino"}.items():
     ss.setdefault(_k, _v)
@@ -626,20 +625,20 @@ def nodos_con_posicion() -> pd.DataFrame:
 # --------------------------------------------------------------------------
 # Encabezado y pestañas
 # --------------------------------------------------------------------------
-st.title("🌐 Enrutamiento adaptativo · Sink Tree y rutas óptimas")
+st.title("Enrutamiento adaptativo · Sink Tree y rutas óptimas")
 st.caption("Teoría de grafos: Dijkstra (Sink Tree) + Yen (K rutas más cortas) sobre una red "
            "con pesos, saltos, retardo y ancho de banda que cambian en tiempo real.")
 
 tab_vivo, tab_red, tab_teoria, tab_export = st.tabs(
-    ["🛰️ Red en vivo", "✏️ Construir / editar red", "📐 Teoría y fórmulas", "⬇️ Exportar"])
+    ["Red en vivo", "Construir / editar red", "Teoría y fórmulas", "Exportar"])
 
 # --------------------------------------------------------------------------
-# ✏️ Construir / editar red  (se ejecuta primero: el resto depende de ella)
+# Construir / editar red  (se ejecuta primero: el resto depende de ella)
 # --------------------------------------------------------------------------
 with tab_red:
     zona_herr = st.container()
     st.markdown("#### Tablas editables")
-    st.caption("Escribe directamente en las celdas. Agrega filas con ➕ al final de cada tabla y "
+    st.caption("Escribe directamente en las celdas. Agrega filas con el botón + al final de cada tabla y "
                "bórralas seleccionándolas. Un nodo nuevo puede quedar sin X/Y: se ubica solo.")
     c_nod, c_enl = st.columns([1, 2.3])
     with c_nod:
@@ -658,7 +657,7 @@ with tab_red:
             column_config={
                 "Origen": st.column_config.TextColumn("Desde", required=True),
                 "Destino": st.column_config.TextColumn("Hasta", required=True),
-                "Peso": st.column_config.NumberColumn("⚖️ Peso", min_value=0.0, step=1.0,
+                "Peso": st.column_config.NumberColumn("Peso", min_value=0.0, step=1.0,
                                                       help="Número que se suma para elegir rutas"),
                 "Retardo_ms": st.column_config.NumberColumn("Retardo (ms)", min_value=0.0, step=1.0),
                 "Banda_Mbps": st.column_config.NumberColumn("Ancho de banda (Mbps)", min_value=0.0,
@@ -678,7 +677,7 @@ with tab_red:
         h1, h2, h3, h4 = st.columns(4)
         with h1:
             with st.form("f_nodo", clear_on_submit=True):
-                st.markdown("**➕ Agregar nodo**")
+                st.markdown("**Agregar nodo**")
                 sugerido = next(n for n in nombres(len(ss.nodos) + 30) if n not in ss.nodos)
                 nuevo = st.text_input("Nombre", value=sugerido)
                 conectar = st.multiselect("Conectar con", ss.nodos)
@@ -698,7 +697,7 @@ with tab_red:
                         st.rerun()
         with h2:
             with st.form("f_enlace"):
-                st.markdown("**🔗 Crear o cambiar un camino**")
+                st.markdown("**Crear o cambiar un camino**")
                 ca, cb = st.columns(2)
                 u_e = ca.selectbox("Desde", ss.nodos, key="fe_u")
                 v_e = cb.selectbox("Hasta", ss.nodos, index=min(1, len(ss.nodos) - 1), key="fe_v")
@@ -723,7 +722,7 @@ with tab_red:
                         st.rerun()
         with h3:
             with st.form("f_rand"):
-                st.markdown("**🎲 Red aleatoria realista**")
+                st.markdown("**Red aleatoria realista**")
                 n_r = st.slider("Número de nodos", 3, 60, 12)
                 g_r = st.slider("Grado medio (conexiones por nodo)", 1.5, 5.0, 2.8, 0.1)
                 cw1, cw2 = st.columns(2)
@@ -737,7 +736,7 @@ with tab_red:
                     ss._pend = {"origen": o_r, "destino": d_r}
                     st.rerun()
         with h4:
-            st.markdown("**🗑️ Quitar y ordenar**")
+            st.markdown("**Quitar y ordenar**")
             quitar_n = st.selectbox("Nodo a quitar", ss.nodos, key="q_nodo")
             if st.button("Quitar nodo y sus caminos", width="stretch", disabled=not ss.nodos):
                 nl = ss.links_cur[(ss.links_cur.Origen.map(_txt) != quitar_n)
@@ -753,11 +752,11 @@ with tab_red:
                                    for r in ss.links_cur.itertuples()]]
                 aplicar(nl, nodos_con_posicion())
                 st.rerun()
-            if st.button("🧭 Reorganizar dibujo automático", width="stretch"):
+            if st.button("Reorganizar dibujo automático", width="stretch"):
                 ss.pos = layout_fr(ss.nodos, [(e.u, e.v) for e in ss.base_enlaces])
                 aplicar(ss.links_cur, nodos_con_posicion())
                 st.rerun()
-            if st.button("↺ Restaurar red de ejemplo", width="stretch"):
+            if st.button("Restaurar red de ejemplo", width="stretch"):
                 aplicar(df_enlaces(ENLACES_BASE), df_nodos(NODOS_BASE), reiniciar=True)
                 ss._pend = {"origen": "H", "destino": "B"}
                 st.rerun()
@@ -788,16 +787,16 @@ with st.sidebar:
             i_sel = fila_sel[0]
             r_sel = ss.links_cur.loc[i_sel]
             u_s, v_s = ss.arista_sel
-            st.markdown(f"### ✏️ Camino {u_s} – {v_s}")
+            st.markdown(f"### Editar camino {u_s} – {v_s}")
             with st.form(f"f_sel_{u_s}_{v_s}_{ss.ver}"):
-                w_s = st.number_input("⚖️ Peso", 0.0, value=_num(r_sel.Peso, 1.0), step=1.0)
+                w_s = st.number_input("Peso", 0.0, value=_num(r_sel.Peso, 1.0), step=1.0)
                 d_s = st.number_input("Retardo (ms)", 0.0, value=_num(r_sel.Retardo_ms, 1.0),
                                       step=1.0)
                 b_s = st.number_input("Ancho de banda (Mbps)", 0.0,
                                       value=_num(r_sel.Banda_Mbps, 100.0), step=1.0)
                 a_s = st.checkbox("Activo", value=True if _vacio(r_sel.Activo)
                                   else bool(r_sel.Activo))
-                if st.form_submit_button("💾 Guardar", type="primary", width="stretch"):
+                if st.form_submit_button("Guardar", type="primary", width="stretch"):
                     nl = ss.links_cur.copy()
                     nl.loc[i_sel, ["Peso", "Retardo_ms", "Banda_Mbps", "Activo"]] = \
                         [w_s, d_s, b_s, a_s]
@@ -808,13 +807,13 @@ with st.sidebar:
                 st.rerun()
             st.divider()
 
-    st.title("🎛️ Panel de control")
+    st.title("Panel de control")
     if not ss.nodos:
         st.error("La red está vacía. Agrega nodos en «Construir / editar red».")
     else:
         c_o, c_d = st.columns(2)
-        c_o.selectbox("🔵 Origen", ss.nodos, key="origen")
-        c_d.selectbox("🟡 Destino", ss.nodos, key="destino")
+        c_o.selectbox("Origen", ss.nodos, key="origen")
+        c_d.selectbox("Destino", ss.nodos, key="destino")
         st.radio("Clic en un nodo del grafo lo vuelve:", ["Destino", "Origen"], key="modo_clic",
                  horizontal=True)
     st.number_input("Cantidad de rutas óptimas (K)", 1, 5, step=1, key="K")
@@ -831,20 +830,20 @@ with st.sidebar:
                          "sea menor. Cambia las rutas cuando sube la carga.")
 
     st.divider()
-    st.subheader("⏱️ Tiempo real")
+    st.subheader("Tiempo real")
     st.toggle("Simulación de tráfico activa", key="sim")
-    st.slider("Actualizar cada (s)", 0.5, 10.0, step=0.5, key="intervalo")
+    st.slider("Actualizar cada (segundos)", 2.0, 60.0, step=1.0, key="intervalo")
     st.slider("Volatilidad del tráfico (R1)", 0.0, 0.20, step=0.01, key="vol")
     st.slider("Probabilidad de falla por tick (R3)", 0.0, 0.20, step=0.005, key="pfalla",
               format="%.3f")
     st.checkbox("El tráfico también modifica el peso (w·(1+ρ))", key="afecta")
     cb1, cb2 = st.columns(2)
-    if cb1.button("⏭ Un paso", width="stretch", disabled=ss.sim):
+    if cb1.button("Un paso", width="stretch", disabled=ss.sim):
         ss._paso = True
-    cb2.button("🧹 Sin tráfico", width="stretch", on_click=limpiar_trafico)
+    cb2.button("Quitar tráfico", width="stretch", on_click=limpiar_trafico)
 
     st.divider()
-    st.subheader("🖼️ Vista del grafo")
+    st.subheader("Vista del grafo")
     st.slider("Alto del grafo (px)", 380, 1200, step=20, key="alto")
     st.slider("Tamaño de los nodos", 20, 70, step=2, key="tam")
     st.selectbox("Número sobre cada camino", ["Peso", "Costo actual", "Retardo", "Banda disponible",
@@ -857,7 +856,7 @@ with st.sidebar:
 # --------------------------------------------------------------------------
 def texto_etiqueta(e: Enlace, costo_e: float, tipo: str) -> str:
     if not e.operativo:
-        return "✕"
+        return "caído"
     if tipo == "Peso":
         return fmt(round(e.w, 1))
     if tipo == "Costo actual":
@@ -885,7 +884,7 @@ def dibujar(red: Red, pos, origen, destino, rutas, sig, dist, costo, modo="rutas
     xs = [p[0] for p in pos.values()] or [0]
     ys = [p[1] for p in pos.values()] or [0]
     span = max(max(xs) - min(xs), max(ys) - min(ys), 1.0)
-    paso = span * 0.022
+    paso = span * 0.032
     en_arbol = {clave(n, s) for n, s in sig.items()}
 
     # 1) Enlaces base agrupados (pocas trazas = dibujo rápido)
@@ -898,10 +897,10 @@ def dibujar(red: Red, pos, origen, destino, rutas, sig, dist, costo, modo="rutas
             estilo = ("Excluido por QoS", C_QOS, 2.5, "dot")
         elif modo == "sink":
             estilo = ("Rama del Sink Tree", C_ARBOL, 6, "solid") if e.clave in en_arbol \
-                else ("No usado por el árbol", "#d3d9e0", 1.5, "dot")
+                else ("No usado por el árbol", "#b0bac4", 2, "dot")
         else:
             r = e.banda / red.b_ref
-            ancho = 1.8 if r <= 0.34 else (3.2 if r <= 0.67 else 4.8)
+            ancho = 2.5 if r <= 0.34 else (3.5 if r <= 0.67 else 5.0)
             estilo = ("Enlace", C_ENLACE, ancho, "solid")
         grupos.setdefault(estilo, [[], []])
         grupos[estilo][0] += [x0, x1, None]
@@ -926,8 +925,8 @@ def dibujar(red: Red, pos, origen, destino, rutas, sig, dist, costo, modo="rutas
                 rx += [x0 + nx, x1 + nx, None]
                 ry += [y0 + ny, y1 + ny, None]
             fig.add_trace(go.Scatter(
-                x=rx, y=ry, mode="lines", hoverinfo="skip", opacity=0.92, legendrank=i + 1,
-                line=dict(color=C_RUTAS[i], width=[10, 7, 6, 5, 5][i]),
+                x=rx, y=ry, mode="lines", hoverinfo="skip", opacity=1.0, legendrank=i + 1,
+                line=dict(color=C_RUTAS[i], width=[8, 6, 5, 4, 4][i]),
                 name=f"Ruta {i + 1} · {fmt(round(costo_ruta(r, costo), 3))}"))
 
     # 3) Número sobre cada camino (clicable)
@@ -955,7 +954,7 @@ def dibujar(red: Red, pos, origen, destino, rutas, sig, dist, costo, modo="rutas
             + "<br><i>Clic para editar</i>")
     fig.add_trace(go.Scatter(
         x=lx, y=ly, mode="markers+text", text=tx, textposition="middle center",
-        textfont=dict(size=11, color="#10222e"), hovertext=hv, hoverinfo="text",
+        textfont=dict(size=12, color="#10222e"), hovertext=hv, hoverinfo="text",
         marker=dict(symbol="square", size=tam, color=fondo, line=dict(color=borde, width=1.6)),
         customdata=[f"{a}|{b}" for a, b in claves_e], showlegend=False,
         selected=dict(marker=dict(opacity=1)), unselected=dict(marker=dict(opacity=1))))
@@ -1003,7 +1002,7 @@ def dibujar(red: Red, pos, origen, destino, rutas, sig, dist, costo, modo="rutas
 
     # 6) Flechas del Sink Tree (cada nodo apunta a su siguiente salto)
     if modo == "sink" or ss.overlay:
-        col = C_ARBOL if modo == "sink" else "rgba(42,157,143,0.6)"
+        col = C_ARBOL if modo == "sink" else "rgba(27,127,116,0.8)"
         for n, s in sig.items():
             (xa, ya), (xb, yb) = pos[n], pos[s]
             # la flecha arranca después del número del camino para no taparlo
@@ -1083,7 +1082,7 @@ def criterio_actual() -> Criterio:
 
 
 # --------------------------------------------------------------------------
-# 🛰️ Red en vivo  (fragmento que se refresca solo cada «intervalo» segundos)
+# Red en vivo  (fragmento que se refresca solo cada «intervalo» segundos)
 # --------------------------------------------------------------------------
 @st.fragment(run_every=float(ss.intervalo) if ss.sim else None)
 def panel_vivo():
@@ -1111,12 +1110,12 @@ def panel_vivo():
     m1.metric("Origen → Destino", f"{origen} → {destino}")
     m2.metric(f"Mejor ruta · costo {fmt(round(costo_ruta(rutas[0], costo), 3))}" if rutas
               else "Mejor ruta", " → ".join(rutas[0]) if rutas else "sin camino")
-    m3.metric("Tick · " + ("🟢 en vivo" if ss.sim else "⏸ pausado"), ss.tick)
+    m3.metric("Actualización n.º" if ss.sim else "Pausado en n.º", ss.tick)
     m4.metric("Enlaces caídos", caidos)
     m5.metric("Carga media", f"{carga_media * 100:.0f}%")
 
-    s1, s2, s3, s4 = st.tabs(["🗺️ Grafo y rutas óptimas", "🌳 Sink Tree",
-                              "📶 Estado de los enlaces", "📈 Historial adaptativo"])
+    s1, s2, s3, s4 = st.tabs(["Grafo y rutas óptimas", "Sink Tree",
+                              "Estado de los enlaces", "Historial adaptativo"])
 
     # ---- Grafo + K rutas -------------------------------------------------
     with s1:
@@ -1124,7 +1123,7 @@ def panel_vivo():
             st.warning("Origen y destino son el mismo nodo: elige otro destino.")
         elif not rutas:
             st.error(f"No existe camino {origen} → {destino} con los enlaces disponibles.")
-        st.caption("🖱️ Clic en un **nodo** → lo vuelve " + ss.modo_clic.lower()
+        st.caption("Clic en un **nodo** → lo vuelve " + ss.modo_clic.lower()
                    + " · clic en el **número de un camino** → editar su peso · rueda = zoom · "
                      "arrastrar = mover. Grosor gris = ancho de banda; color del recuadro = carga.")
         fig, mapa = dibujar(red, ss.pos, origen, destino, rutas, sig, dist, costo, "rutas")
@@ -1148,7 +1147,7 @@ def panel_vivo():
             mejor = costo_ruta(rutas[0], costo)
             for i, r in enumerate(rutas):
                 m = metricas_ruta(red, r, costo)
-                fila = {"#": f"{EMOJI_RUTAS[i]} {i + 1}", "Ruta": " → ".join(r),
+                fila = {"Ruta n.º": i + 1, "Recorrido": " → ".join(r),
                         "Suma de pesos": m["suma_pesos"], "Saltos": m["saltos"],
                         "Retardo (ms)": round(m["retardo"], 1),
                         "Banda cuello (Mbps)": round(m["banda"], 1)}
@@ -1208,7 +1207,7 @@ def panel_vivo():
                 "Retardo (ms)": e.retardo, "Retardo efectivo": round(e.retardo_ef, 2),
                 "Banda (Mbps)": e.banda, "Banda disponible": round(e.banda_disp, 1),
                 "Carga": e.carga,
-                "Estado": "✅ activo" if e.operativo else ("⚡ caído" if e.falla else "⛔ apagado"),
+                "Estado": "Activo" if e.operativo else ("Caído" if e.falla else "Apagado"),
                 "Costo": None if c_e == INF else round(c_e, 4),
                 "En rutas": ", ".join(en_ruta.get(e.clave, [])) or "—"})
         ss.exp_estado = pd.DataFrame(filas_e)
@@ -1238,7 +1237,7 @@ with tab_vivo:
     panel_vivo()
 
 # --------------------------------------------------------------------------
-# 📐 Teoría y fórmulas
+# Teoría y fórmulas
 # --------------------------------------------------------------------------
 with tab_teoria:
     st.markdown("### La red como grafo")
@@ -1283,7 +1282,7 @@ with tab_teoria:
         "cada vez que la mejor ruta cambia y la causa.")
 
 # --------------------------------------------------------------------------
-# ⬇️ Exportar
+# Exportar
 # --------------------------------------------------------------------------
 with tab_export:
     st.markdown("Descarga la red para guardarla o cárgala otra vez más tarde.")
@@ -1294,25 +1293,25 @@ with tab_export:
                      "banda_mbps": e.banda, "activo": e.activo} for e in ss.base_enlaces],
     }
     e1, e2, e3 = st.columns(3)
-    e1.download_button("⬇ Red completa (JSON)", json.dumps(topologia, indent=2, ensure_ascii=False),
+    e1.download_button("Descargar Red completa (JSON)", json.dumps(topologia, indent=2, ensure_ascii=False),
                        "red.json", "application/json", width="stretch")
-    e2.download_button("⬇ Caminos y pesos (CSV)",
+    e2.download_button("Descargar Caminos y pesos (CSV)",
                        ss.links_cur.to_csv(index=False).encode("utf-8"),
                        "caminos.csv", "text/csv", width="stretch")
     if ss.get("exp_rutas") is not None:
-        e3.download_button("⬇ Rutas óptimas (CSV)", ss.exp_rutas.to_csv(index=False).encode("utf-8"),
+        e3.download_button("Descargar Rutas óptimas (CSV)", ss.exp_rutas.to_csv(index=False).encode("utf-8"),
                            "rutas_optimas.csv", "text/csv", width="stretch")
     e4, e5, e6 = st.columns(3)
     if ss.get("exp_sink") is not None:
-        e4.download_button("⬇ Sink Tree (CSV)", ss.exp_sink.to_csv(index=False).encode("utf-8"),
+        e4.download_button("Descargar Sink Tree (CSV)", ss.exp_sink.to_csv(index=False).encode("utf-8"),
                            "sink_tree.csv", "text/csv", width="stretch")
     if ss.get("exp_estado") is not None:
-        e5.download_button("⬇ Estado de enlaces (CSV)",
+        e5.download_button("Descargar Estado de enlaces (CSV)",
                            ss.exp_estado.to_csv(index=False).encode("utf-8"),
                            "estado_enlaces.csv", "text/csv", width="stretch")
     if ss.hist:
         dfh = pd.DataFrame(ss.hist).drop(columns=["_r1", "_c1"])
-        e6.download_button("⬇ Historial (CSV)", dfh.to_csv(index=False).encode("utf-8"),
+        e6.download_button("Descargar Historial (CSV)", dfh.to_csv(index=False).encode("utf-8"),
                            "historial.csv", "text/csv", width="stretch")
 
     st.divider()
