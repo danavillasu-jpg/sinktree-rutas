@@ -1,15 +1,23 @@
 # Enrutamiento adaptativo · Sink Tree y rutas óptimas
 
-## Cómo ejecutarlo (Windows, macOS o Linux)
+## Cómo abrirlo
 
-Necesitas Python 3.9 o superior.
+**Requisito:** tener Python 3.9 o superior (https://www.python.org/downloads/).
+En Windows, al instalarlo, marcar la casilla **"Add python.exe to PATH"**.
+
+**Opción fácil (doble clic):**
+- Windows: doble clic en `ejecutar.bat`
+- macOS: doble clic en `ejecutar.command`
+
+La primera vez instala las librerías (1–2 minutos, requiere internet) y luego abre el
+programa en el navegador (http://localhost:8501). Para cerrarlo, cerrar la ventana negra.
+
+**Opción con terminal:**
 
 ```bash
 python -m pip install -r requirements.txt
 python -m streamlit run main.py
 ```
-
-Se abre solo en el navegador (http://localhost:8501).
 
 ## Uso rápido
 
@@ -28,3 +36,4 @@ Se abre solo en el navegador (http://localhost:8501).
 
 - `main.py`: motor de cálculo (Dijkstra, Sink Tree, Yen, simulación) + interfaz Streamlit
 - `requirements.txt`: librerías necesarias
+- `ejecutar.bat` / `ejecutar.command`: abren el programa con doble clic (Windows / macOS)
